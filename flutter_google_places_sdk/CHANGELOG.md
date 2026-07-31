@@ -1,3 +1,10 @@
+## 0.4.4
+
+* Upgrade the platform interface to `0.4.0` and the platform implementations
+  available from upstream master.
+* Remove the obsolete `useNewApi` option; the upgraded implementations use the
+  new Places API.
+
 ## 0.4.3
 
 * Upgrading `flutter_google_places_sdk_platform_interface` to `0.3.4`

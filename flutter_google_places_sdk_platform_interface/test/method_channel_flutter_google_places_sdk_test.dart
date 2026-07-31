@@ -115,7 +115,7 @@ void main() {
         <Matcher>[
           isMethodCall('fetchPlace', arguments: <String, Object>{
             'placeId': placeId,
-            'fields': testFields.map((e) => e.value).toList(growable: false),
+            'fields': testFields.map((e) => e.name).toList(growable: false),
             'newSessionToken': newSessionToken,
             'regionCode': 'us',
           })
@@ -201,7 +201,7 @@ void main() {
             'searchByText',
             arguments: <String, Object>{
               'textQuery': testQuery,
-              'fields': ['ID', 'NAME'],
+              'fields': ['ID', 'DISPLAY_NAME'],
               'includedType': 'test',
               'maxResultCount': 9,
               'locationBias': locationBias.toJson(),
@@ -241,7 +241,7 @@ void main() {
           isMethodCall(
             'searchNearby',
             arguments: <String, Object>{
-              'fields': ['ID', 'NAME'],
+              'fields': ['ID', 'DISPLAY_NAME'],
               'locationRestriction': locationRestriction.toJson(),
               'includedTypes': types,
               'includedPrimaryTypes': types,

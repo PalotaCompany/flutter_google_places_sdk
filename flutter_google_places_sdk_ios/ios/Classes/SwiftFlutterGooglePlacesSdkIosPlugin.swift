@@ -273,23 +273,26 @@ public class SwiftFlutterGooglePlacesSdkIosPlugin: NSObject, FlutterPlugin {
     
     private func placeFieldFromStr(it: String) -> GMSPlaceField {
         switch (it) {
-        case "ADDRESS": return GMSPlaceField.formattedAddress
-        case "ADDRESS_COMPONENTS": return GMSPlaceField.addressComponents
-        case "BUSINESS_STATUS": return GMSPlaceField.businessStatus
-        case "ID": return GMSPlaceField.placeID
-        case "LAT_LNG": return GMSPlaceField.coordinate
-        case "NAME": return GMSPlaceField.name
-        case "OPENING_HOURS": return GMSPlaceField.openingHours
-        case "PHONE_NUMBER": return GMSPlaceField.phoneNumber
-        case "PHOTO_METADATAS": return GMSPlaceField.photos
-        case "PLUS_CODE": return GMSPlaceField.plusCode
-        case "PRICE_LEVEL": return GMSPlaceField.priceLevel
-        case "RATING": return GMSPlaceField.rating
-        case "TYPES": return GMSPlaceField.types
-        case "USER_RATINGS_TOTAL": return GMSPlaceField.userRatingsTotal
-        case "UTC_OFFSET": return GMSPlaceField.utcOffsetMinutes
-        case "VIEWPORT": return GMSPlaceField.viewport
-        case "WEBSITE_URI": return GMSPlaceField.website
+        case "FormattedAddress", "FormattedAddressAdr", "ADDRESS", "FORMATTED_ADDRESS":
+            return GMSPlaceField.formattedAddress
+        case "AddressComponents", "ADDRESS_COMPONENTS": return GMSPlaceField.addressComponents
+        case "BusinessStatus", "BUSINESS_STATUS": return GMSPlaceField.businessStatus
+        case "Id", "ID": return GMSPlaceField.placeID
+        case "Location", "LAT_LNG", "LOCATION": return GMSPlaceField.coordinate
+        case "DisplayName", "NAME", "DISPLAY_NAME": return GMSPlaceField.name
+        case "OpeningHours", "OPENING_HOURS": return GMSPlaceField.openingHours
+        case "NationalPhoneNumber", "InternationalPhoneNumber", "PHONE_NUMBER":
+            return GMSPlaceField.phoneNumber
+        case "Photos", "PHOTO_METADATAS", "PHOTOS": return GMSPlaceField.photos
+        case "PlusCode", "PLUS_CODE": return GMSPlaceField.plusCode
+        case "PriceLevel", "PRICE_LEVEL": return GMSPlaceField.priceLevel
+        case "Rating", "RATING": return GMSPlaceField.rating
+        case "Types", "TYPES": return GMSPlaceField.types
+        case "UserRatingCount", "USER_RATINGS_TOTAL", "USER_RATING_COUNT":
+            return GMSPlaceField.userRatingsTotal
+        case "UtcOffset", "UTC_OFFSET": return GMSPlaceField.utcOffsetMinutes
+        case "Viewport", "VIEWPORT": return GMSPlaceField.viewport
+        case "WebsiteUri", "WEBSITE_URI": return GMSPlaceField.website
         default:
             fatalError("Invalid placeField: \(it)")
         }

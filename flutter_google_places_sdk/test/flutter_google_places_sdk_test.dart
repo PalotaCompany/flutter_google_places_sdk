@@ -77,14 +77,17 @@ void main() {
   group('FlutterGooglePlacesSdk', () {
     setUp(() {
       responses = Map<String, dynamic>.from(kDefaultResponses);
-      channel.setMockMethodCallHandler((MethodCall methodCall) {
-        log.add(methodCall);
-        final dynamic response = responses[methodCall.method];
-        if (response != null && response is Exception) {
-          return Future<dynamic>.error('$response');
-        }
-        return Future<dynamic>.value(response);
-      });
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+        channel,
+        (MethodCall methodCall) {
+          log.add(methodCall);
+          final dynamic response = responses[methodCall.method];
+          if (response != null && response is Exception) {
+            return Future<dynamic>.error('$response');
+          }
+          return Future<dynamic>.value(response);
+        },
+      );
       flutterGooglePlacesSdk =
           FlutterGooglePlacesSdk(kDefaultApiKey, locale: kDefaultLocale);
       log.clear();
@@ -135,7 +138,7 @@ void main() {
                 arguments: <String, dynamic>{
                   'query': queryTest,
                   'countries': countriesTest,
-                  "typeFilter": "ESTABLISHMENT",
+                  'typesFilter': ['establishment'],
                   'newSessionToken': false,
                   'origin': origin.toJson(),
                   'locationBias': null,
@@ -163,8 +166,9 @@ void main() {
             _getInitializeMatcher(),
             isMethodCall('fetchPlace', arguments: <String, dynamic>{
               'placeId': placeId,
-              'fields': fields.map((e) => e..name).toList(growable: false),
+              'fields': fields.map((e) => e.name).toList(growable: false),
               'newSessionToken': null,
+              'regionCode': null,
             }),
           ],
         );
