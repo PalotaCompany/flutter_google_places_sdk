@@ -35,6 +35,7 @@ analyzer:
     - "lib/src/http/**"
     - "**.g.dart"
     - "**.freezed.dart"
+    - build/**
 
 linter:
   rules:
