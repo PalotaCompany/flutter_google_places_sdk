@@ -55,8 +55,12 @@ public class SwiftFlutterGooglePlacesSdkIosPlugin: NSObject, FlutterPlugin {
             filter.locationBias = locationBias
             filter.locationRestriction = locationRestriction
 
-            placesClient.findAutocompletePredictions(
-                fromQuery: query, filter: filter, sessionToken: sessionToken,
+            let request = GMSAutocompleteRequest(query: query)
+            request.filter = filter
+            request.sessionToken = sessionToken
+
+            placesClient.fetchAutocompleteSuggestions(
+                from: request,
                 callback: { (results, error) in
                     if let error = error {
                         print("findAutoCompletePredictions error: \(error)")
@@ -74,17 +78,16 @@ public class SwiftFlutterGooglePlacesSdkIosPlugin: NSObject, FlutterPlugin {
         case METHOD_FETCH_PLACE:
             let args = call.arguments as! Dictionary<String,Any>
             let placeId = args["placeId"] as! String
-            let fields = ((args["fields"] as? [String])?.map {
-                (item) in return placeFieldFromStr(it: item)
-            })?.reduce(GMSPlaceField(), { partialResult, field in
-                return GMSPlaceField(rawValue: partialResult.rawValue | field.rawValue)
-            })
+            let properties = (args["fields"] as? [String])?.map {
+                (item) in return placePropertyFromStr(it: item).rawValue
+            }
             let newSessionToken = args["newSessionToken"] as? Bool ?? false
             let sessionToken = getSessionToken(force: newSessionToken == true)
-            
-            placesClient.fetchPlace(fromPlaceID: placeId,
-                                    placeFields: fields ?? GMSPlaceField.all,
-                                    sessionToken: sessionToken) { (place, error) in
+            let request = GMSFetchPlaceRequest(placeID: placeId,
+                                               placeProperties: properties ?? [GMSPlaceProperty.all.rawValue],
+                                               sessionToken: sessionToken)
+
+            placesClient.fetchPlace(with: request) { (place, error) in
                 if let error = error {
                     print("fetchPlace error: \(error)")
                     result(FlutterError(
@@ -103,7 +106,12 @@ public class SwiftFlutterGooglePlacesSdkIosPlugin: NSObject, FlutterPlugin {
             let photoRef = photoMetadataMap["photoReference"] as! String
             
             if let photoMetadata = photosCache[photoRef] {
-                placesClient.loadPlacePhoto(photoMetadata, callback: { (photo, error) -> Void in
+                let maxWidth = args["maxWidth"] as? Int ?? Int(photoMetadata.maxSize.width)
+                let maxHeight = args["maxHeight"] as? Int ?? Int(photoMetadata.maxSize.height)
+                let request = GMSFetchPhotoRequest(
+                    photoMetadata: photoMetadata,
+                    maxSize: CGSize(width: min(max(maxWidth, 1), 4800), height: min(max(maxHeight, 1), 4800)))
+                placesClient.fetchPhoto(with: request, callback: { (photo, error) -> Void in
                     if let error = error {
                         print("fetchPlacePhoto error: \(error)")
                         result(FlutterError(
@@ -271,43 +279,43 @@ public class SwiftFlutterGooglePlacesSdkIosPlugin: NSObject, FlutterPlugin {
       ]
     }
     
-    private func placeFieldFromStr(it: String) -> GMSPlaceField {
+    private func placePropertyFromStr(it: String) -> GMSPlaceProperty {
         switch (it) {
         case "FormattedAddress", "FormattedAddressAdr", "ADDRESS", "FORMATTED_ADDRESS":
-            return GMSPlaceField.formattedAddress
-        case "AddressComponents", "ADDRESS_COMPONENTS": return GMSPlaceField.addressComponents
-        case "BusinessStatus", "BUSINESS_STATUS": return GMSPlaceField.businessStatus
-        case "Id", "ID": return GMSPlaceField.placeID
-        case "Location", "LAT_LNG", "LOCATION": return GMSPlaceField.coordinate
-        case "DisplayName", "NAME", "DISPLAY_NAME": return GMSPlaceField.name
-        case "OpeningHours", "OPENING_HOURS": return GMSPlaceField.openingHours
+            return GMSPlaceProperty.formattedAddress
+        case "AddressComponents", "ADDRESS_COMPONENTS": return GMSPlaceProperty.addressComponents
+        case "BusinessStatus", "BUSINESS_STATUS": return GMSPlaceProperty.businessStatus
+        case "Id", "ID": return GMSPlaceProperty.placeID
+        case "Location", "LAT_LNG", "LOCATION": return GMSPlaceProperty.coordinate
+        case "DisplayName", "NAME", "DISPLAY_NAME": return GMSPlaceProperty.name
+        case "OpeningHours", "OPENING_HOURS": return GMSPlaceProperty.openingHours
         case "NationalPhoneNumber", "InternationalPhoneNumber", "PHONE_NUMBER":
-            return GMSPlaceField.phoneNumber
-        case "Photos", "PHOTO_METADATAS", "PHOTOS": return GMSPlaceField.photos
-        case "PlusCode", "PLUS_CODE": return GMSPlaceField.plusCode
-        case "PriceLevel", "PRICE_LEVEL": return GMSPlaceField.priceLevel
-        case "Rating", "RATING": return GMSPlaceField.rating
-        case "Types", "TYPES": return GMSPlaceField.types
+            return GMSPlaceProperty.phoneNumber
+        case "Photos", "PHOTO_METADATAS", "PHOTOS": return GMSPlaceProperty.photos
+        case "PlusCode", "PLUS_CODE": return GMSPlaceProperty.plusCode
+        case "PriceLevel", "PRICE_LEVEL": return GMSPlaceProperty.priceLevel
+        case "Rating", "RATING": return GMSPlaceProperty.rating
+        case "Types", "TYPES": return GMSPlaceProperty.types
         case "UserRatingCount", "USER_RATINGS_TOTAL", "USER_RATING_COUNT":
-            return GMSPlaceField.userRatingsTotal
-        case "UtcOffset", "UTC_OFFSET": return GMSPlaceField.utcOffsetMinutes
-        case "Viewport", "VIEWPORT": return GMSPlaceField.viewport
-        case "WebsiteUri", "WEBSITE_URI": return GMSPlaceField.website
+            return GMSPlaceProperty.userRatingsTotal
+        case "UtcOffset", "UTC_OFFSET": return GMSPlaceProperty.utcOffsetMinutes
+        case "Viewport", "VIEWPORT": return GMSPlaceProperty.viewport
+        case "WebsiteUri", "WEBSITE_URI": return GMSPlaceProperty.website
         default:
             fatalError("Invalid placeField: \(it)")
         }
     }
     
-    private func responseToList(results: [GMSAutocompletePrediction]?) -> [Dictionary<String, Any?>]? {
+    private func responseToList(results: [GMSAutocompleteSuggestion]?) -> [Dictionary<String, Any?>]? {
         guard let results = results else {
             return nil;
         }
-        
-        return results.map { (prediction: GMSAutocompletePrediction) in
-            return predictionToMap(prediction: prediction) }
+
+        return results.compactMap { (suggestion: GMSAutocompleteSuggestion) in
+            return suggestion.placeSuggestion.map { predictionToMap(prediction: $0) } }
     }
-    
-    private func predictionToMap(prediction: GMSAutocompletePrediction) -> Dictionary<String, Any?> {
+
+    private func predictionToMap(prediction: GMSAutocompletePlaceSuggestion) -> Dictionary<String, Any?> {
         return [
             "placeId": prediction.placeID,
             "distanceMeters": prediction.distanceMeters,
