@@ -514,7 +514,7 @@ class FlutterGooglePlacesSdkPlugin : FlutterPlugin, MethodCallHandler {
         if (country == null) {
             country = Locale.getDefault().country
         }
-        return Locale(language, country)
+        return Locale.Builder().setLanguage(language).setRegion(country).build()
     }
 
     private fun initialize(apiKey: String?, locale: Locale?) {
