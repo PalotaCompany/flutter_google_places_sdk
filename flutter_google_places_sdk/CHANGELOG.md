@@ -1,3 +1,7 @@
+## 0.4.5
+
+* Take the iOS and Android implementations from this repository.
+
 ## 0.4.4
 
 * Upgrade the platform interface to `0.4.0` and the platform implementations

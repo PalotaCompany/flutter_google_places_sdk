@@ -1,3 +1,10 @@
+## 0.3.0
+
+* Upgrading `flutter_google_places_sdk_platform_interface` to `0.4.0` (upstream PR #153)
+* Requires GooglePlaces `10.15` and iOS `16.0`
+* Adds a Swift package manifest (upstream PR #154)
+* Uses the current GooglePlaces API: `fetchAutocompleteSuggestions`, `fetchPlace(with:)` and `fetchPhoto(with:)`
+
 ## 0.2.2
 
 * Upgrading `flutter_google_places_sdk_platform_interface` to `0.3.4`

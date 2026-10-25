@@ -1,3 +1,9 @@
+## 0.3.1
+
+* Upgrading the Places SDK to `6.0.2`
+* Migrated to built-in Kotlin (upstream PR #153)
+* Builds the locale with `Locale.Builder`
+
 ## 0.3.0
 
 * Upgrading `flutter_google_places_sdk_platform_interface` to `0.4.0`
