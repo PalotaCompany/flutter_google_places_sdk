@@ -151,6 +151,16 @@ void main() {
             FindAutocompletePredictionsResponse([kPrediction1, kPrediction2]);
         expect(result, equals(expected));
       });
+
+      test('sends included primary types as API type names', () async {
+        await flutterGooglePlacesSdk.findAutocompletePredictions('query',
+            includedPrimaryTypes: [PlaceType.STREET_ADDRESS, PlaceType.ROUTE]);
+
+        expect(
+          (log.last.arguments as Map)['typesFilter'],
+          ['street_address', 'route'],
+        );
+      });
     });
 
     group('fetchPlace', () {

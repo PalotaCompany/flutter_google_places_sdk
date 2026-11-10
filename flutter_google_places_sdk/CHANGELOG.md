@@ -1,3 +1,8 @@
+## 0.4.6
+
+* Add `includedPrimaryTypes` to `findAutocompletePredictions`, to filter by
+  Places API (New) place types (the new API rejects `PlaceTypeFilter.ADDRESS`).
+
 ## 0.4.5
 
 * Take the iOS and Android implementations from this repository.

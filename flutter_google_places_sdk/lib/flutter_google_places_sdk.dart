@@ -93,6 +93,7 @@ class FlutterGooglePlacesSdk {
     String query, {
     List<String>? countries,
     List<PlaceTypeFilter> placeTypesFilter = const [],
+    List<PlaceType> includedPrimaryTypes = const [],
     bool? newSessionToken,
     LatLng? origin,
     LatLngBounds? locationBias,
@@ -101,8 +102,10 @@ class FlutterGooglePlacesSdk {
     return _addMethodCall(() => platform.findAutocompletePredictions(
           query,
           countries: countries,
-          placeTypesFilter:
-              placeTypesFilter.map((type) => type.apiExpectedValue).toList(),
+          placeTypesFilter: [
+            ...placeTypesFilter.map((type) => type.apiExpectedValue),
+            ...includedPrimaryTypes.map((type) => type.name.toLowerCase()),
+          ],
           newSessionToken: newSessionToken,
           origin: origin,
           locationBias: locationBias,
